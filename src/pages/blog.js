@@ -1,35 +1,36 @@
 import React from "react"
-import { graphql, useStaticQuery, Link } from "gatsby"
+import { Link, graphql, useStaticQuery } from "gatsby"
+import Head from "../components/head"
 
 import Layout from "../components/layout"
+import * as blogStyles from "./blog.module.scss"
 
 const BlogPage = () => {
   const data = useStaticQuery(graphql`
     query {
-      allMarkdownRemark {
+      allContentfulBlogPost(sort: { fields: publishedDate, order: DESC }) {
         edges {
           node {
-            frontmatter {
-              title
-              date
-            }
+            title
+            slug
+            publishedDate(formatString: "MMMM Do, YYYY")
           }
         }
       }
     }
   `)
-  console.log(data)
 
   return (
     <Layout>
+      <Head title="Blog" />
       <h1>Blog</h1>
-      ,<ol>
-        {data.allMarkdownRemark.edges.map((edge) => {
+      <ol className={blogStyles.posts}>
+        {data.allContentfulBlogPost.edges.map(edge => {
           return (
-            <li>
-              <Link to={`/blog/${edge.node.fields.slug}`}>
-              <h2>{edge.node.frontmatter.title}</h2>
-              <p>{edge.node.frontmatter.date}</p>
+            <li className={blogStyles.post}>
+              <Link to={`/blog/${edge.node.slug}`}>
+                <h2>{edge.node.title}</h2>
+                <p>{edge.node.publishedDate}</p>
               </Link>
             </li>
           )
@@ -40,10 +41,3 @@ const BlogPage = () => {
 }
 
 export default BlogPage
-
-//
-// Goal: Create an about page and a contact page
-//
-// 1. Create about page. Include a page title and bio.
-// 2. Create a contact page. Include a page title and contact details.
-// 3. Test your work
